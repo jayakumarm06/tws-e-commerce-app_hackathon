@@ -31,7 +31,7 @@ module "eks" {
   access_entries = {
     # One access entry with a policy associated
     example = {
-      principal_arn = "arn:aws:iam::876997124628:user/terraform"
+      principal_arn = "arn:aws:iam::886436923680:user/tf-user-01"
 
       policy_associations = {
         example = {
@@ -99,7 +99,7 @@ module "eks" {
       use_custom_launch_template = false # Important to apply disk size!
 
       remote_access = {
-        ec2_ssh_key               = resource.aws_key_pair.deployer.key_name
+        ec2_ssh_key               = aws_key_pair.aws_ec2_key.key_name
         source_security_group_ids = [aws_security_group.node_group_remote_access.id]
       }
 

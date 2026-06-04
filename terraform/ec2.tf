@@ -9,12 +9,35 @@ data "aws_ami" "os_image" {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd-gp3/*24.04-amd64*"]
   }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
-resource "aws_key_pair" "deployer" {
-  key_name   = "terra-automate-key"
-  public_key = file("terra-key.pub")
+# 1. Generate a secure private key (RSA 4096)
+resource "tls_private_key" "ec2_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
+
+# 2. Register the generated public key with AWS EC2
+resource "aws_key_pair" "aws_ec2_key" {
+  key_name   = "tws-terra-key"
+  public_key = tls_private_key.ec2_key.public_key_openssh
+}
+
+# 3. Save the private key locally to your machine (optional but recommended)
+resource "local_sensitive_file" "private_key" {
+  content         = tls_private_key.ec2_key.private_key_pem
+  filename        = "${path.module}/tws-terra-key.pem"
+  file_permission = "0600"
+}
+
+# resource "aws_key_pair" "deployer" {
+#   key_name   = "terra-automate-key"
+#   public_key = file("terra-key.pub")
+# }
 
 resource "aws_security_group" "allow_user_to_connect" {
   name        = "allow TLS"
@@ -53,7 +76,7 @@ resource "aws_security_group" "allow_user_to_connect" {
 resource "aws_instance" "testinstance" {
   ami                    = data.aws_ami.os_image.id
   instance_type          = var.instance_type
-  key_name               = aws_key_pair.deployer.key_name
+  key_name               = aws_key_pair.aws_ec2_key.key_name
   vpc_security_group_ids = [aws_security_group.allow_user_to_connect.id]
   subnet_id              = module.vpc.public_subnets[0]
   user_data              = file("${path.module}/install_tools.sh")
