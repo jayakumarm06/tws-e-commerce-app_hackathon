@@ -2,6 +2,10 @@ output "region" {
   description = "The AWS region where resources are created"
   value       = local.region
 }
+# output "bucket_name" {
+#   value       = aws_s3_bucket.my_bucket.id
+#   description = "The globally unique name of the S3 bucket"
+# }
 
 output "vpc_id" {
   description = "The ID of the created VPC"
