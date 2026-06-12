@@ -80,6 +80,8 @@ resource "aws_instance" "testinstance" {
   vpc_security_group_ids = [aws_security_group.allow_user_to_connect.id]
   subnet_id              = module.vpc.public_subnets[0]
   user_data              = file("${path.module}/install_tools.sh")
+
+
   tags = {
     Name = "Jenkins-Automate"
   }
