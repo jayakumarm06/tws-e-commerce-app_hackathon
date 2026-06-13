@@ -23,14 +23,14 @@ resource "tls_private_key" "ec2_key" {
 
 # 2. Register the generated public key with AWS EC2
 resource "aws_key_pair" "aws_ec2_key" {
-  key_name   = "tws-terra-key"
+  key_name   = "dewop-terra-key"
   public_key = tls_private_key.ec2_key.public_key_openssh
 }
 
 # 3. Save the private key locally to your machine (optional but recommended)
 resource "local_sensitive_file" "private_key" {
   content         = tls_private_key.ec2_key.private_key_pem
-  filename        = "${path.module}/tws-terra-key.pem"
+  filename        = "${path.module}/dewop-terra-key.pem"
   file_permission = "0600"
 }
 
