@@ -1,7 +1,7 @@
 terraform {
 
   backend "s3" {
-    bucket       = "tws-terraform-hackathon-s3-backend-02"
+    bucket       = "tws-terraform-hackathon-s3-backend-04"
     key          = "backend-locking/terraform.tfstate"
     region       = "ap-south-1"
     encrypt      = true
