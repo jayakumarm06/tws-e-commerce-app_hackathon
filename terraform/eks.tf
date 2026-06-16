@@ -9,7 +9,7 @@ resource "aws_security_group" "node_group_remote_access" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description = " allow all outgoing traffic "
+    description = "allow all outgoing traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -77,7 +77,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
 
-    instance_types = ["t3.medium"]
+    instance_types = ["t3.large"]
 
     attach_cluster_primary_security_group = true
 
@@ -88,11 +88,11 @@ module "eks" {
   eks_managed_node_groups = {
 
     tws-demo-ng = {
-      min_size     = 2
+      min_size     = 1
       max_size     = 3
-      desired_size = 2
+      desired_size = 1
 
-      instance_types = ["t3.medium"]
+      instance_types = ["t3.large"]
       capacity_type  = "SPOT"
 
       disk_size                  = 30
@@ -128,3 +128,8 @@ data "aws_instances" "eks_nodes" {
 
   depends_on = [module.eks]
 }
+
+
+
+
+
