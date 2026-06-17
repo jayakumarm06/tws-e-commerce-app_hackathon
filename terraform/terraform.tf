@@ -1,12 +1,12 @@
 terraform {
 
-  backend "s3" {
-    bucket       = "tws-terraform-hackathon-s3-backend-04"
-    key          = "backend-locking/terraform.tfstate"
-    region       = "ap-south-1"
-    encrypt      = true
-    use_lockfile = true
-  }
+  # backend "s3" {
+  #   bucket       = "tws-terraform-hackathon-s3-backend-05"
+  #   key          = "backend-locking/terraform.tfstate"
+  #   region       = "ap-south-1"
+  #   encrypt      = true
+  #   use_lockfile = true
+  # }
 }
 
 
