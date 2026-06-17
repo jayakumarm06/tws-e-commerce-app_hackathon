@@ -88,14 +88,14 @@ module "eks" {
   eks_managed_node_groups = {
 
     tws-demo-ng = {
-      min_size     = 1
+      min_size     = 3
       max_size     = 3
-      desired_size = 1
+      desired_size = 3
 
       instance_types = ["t3.large"]
       capacity_type  = "SPOT"
 
-      disk_size                  = 30
+      disk_size                  = 35
       use_custom_launch_template = false # Important to apply disk size!
 
       remote_access = {
