@@ -311,7 +311,6 @@ helm upgrade --install aws-ebs-csi-driver \
 ```bash
 helm show values aws-ebs-csi-driver/aws-ebs-csi-driver > ebs-driver.yaml
 ```
-
 4. edit the values file, change the below settings.
 ```
 controller:
@@ -322,6 +321,13 @@ controller:
 5. save and upgrade the helm chart.
 ```
 helm upgrade --install aws-ebs-csi-driver/aws-ebs-csi-driver -n kube-system -f ebs-driver.yaml
+```
+
+6. Use this direct step if edit the values and no need these step 3,5,6.
+```
+helm install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
+  --namespace kube-system \
+  --set controller.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/YOUR_IAM_ROLE_NAME
 ```
 
 **12. Argo CD Setup**<br/>
