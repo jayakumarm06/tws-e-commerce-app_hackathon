@@ -296,7 +296,33 @@ https://docs.aws.amazon.com/eks/latest/userguide/lbc-helm.html
 ```
 https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html#eksctl_store_app_data
 ```
+1. Create an IAM role and attach a policy. AWS maintains an AWS managed policy or you can create your own custom policy
 
+2. Install ebs-csi-driver using helm  
+
+```bash
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+helm upgrade --install aws-ebs-csi-driver \
+    --namespace kube-system \
+    aws-ebs-csi-driver/aws-ebs-csi-driver
+```
+3. get the values file and save it
+```bash
+helm show values aws-ebs-csi-driver/aws-ebs-csi-driver > ebs-driver.yaml
+```
+
+4. edit the values file, change the below settings.
+```
+controller:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123412341234:role/ebs-csi-role
+```
+5. save and upgrade the helm chart.
+```
+helm upgrade --install aws-ebs-csi-driver/aws-ebs-csi-driver -n kube-system -f ebs-driver.yaml
+```
 
 **12. Argo CD Setup**<br/>
 Create a Namespace for Argo CD<br/>
@@ -307,7 +333,7 @@ kubectl create namespace argocd
 (https://artifacthub.io/packages/helm/argo/argo-cd)
 ```bash
 helm repo add argo https://argoproj.github.io/argo-helm
-helm install my-argo-cd argo/argo-cd --version 8.0.10
+helm install my-argo-cd argo/argo-cd --version 8.0.10 -n argocd
 ```
 2. get the values file and save it
 ```bash
@@ -335,23 +361,23 @@ server:
       alb.ingress.kubernetes.io/backend-protocol: HTTP
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/ssl-redirect: '443'
-    hostname: argocd.devopsdock.site
+    hostname: argocd.dewsecopai.online
     aws:
       serviceType: ClusterIP # <- Used with target-type: ip
       backendProtocolVersion: GRPC
 ```
 4. save and upgrade the helm chart.
 ```
-helm upgrade my-argo-cd argo/argo-cd -n argocd -f my-values.yaml
+helm upgrade --install my-argo-cd argo/argo-cd -n argocd -f argocd-values.yaml
 ```
-5. add the record in route53 “argocd.devopsdock.site” with load balancer dns.
+5. add the record in route53 “argocd.dewsecopai.online” with load balancer dns.
 
 6. access it in browser.
 
 7. Retrive the secret for Argocd
 
 ```jsx
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
 ```
 
 8. login to argocd “admin” and retrieved password
@@ -390,7 +416,7 @@ Ingress Annotations:
 annotations:
     alb.ingress.kubernetes.io/group.name: easyshop-app-lb
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:876997124628:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:123456789:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
@@ -398,7 +424,7 @@ annotations:
     kubernetes.io/ingress.class: alb
 ```
 
-- **add record to route 53 “easyshop.devopsdock.site”**
+- **add record to route 53 “easyshop.dewsecopai.online”**
 
 - **Access your site now.**
 
@@ -444,13 +470,13 @@ ingressClassName: alb
 annotations:
       alb.ingress.kubernetes.io/group.name: easyshop-app-lb
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:876997124628:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:123456789:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
       alb.ingress.kubernetes.io/target-type: ip
 			alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/ssl-redirect: '443'
  
     hosts:
-      - grafana.devopsdock.site
+      - grafana.dewsecopai.online
 ```
 
 **Prometheus:** 
@@ -460,7 +486,7 @@ ingressClassName: alb
 annotations:
       alb.ingress.kubernetes.io/group.name: easyshop-app-lb
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:876997124628:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:123456789:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/ssl-redirect: '443'
@@ -469,7 +495,7 @@ annotations:
     
   
     hosts: 
-      - prometheus.devopsdock.site
+      - prometheus.dewsecopai.online
         paths:
         - /
         pathType: Prefix
@@ -486,7 +512,7 @@ annotations:
       alb.ingress.kubernetes.io/ssl-redirect: '443'
     
     hosts: 
-      - alertmanager.devopsdock.site
+      - alertmanager.dewsecopai.online
     paths:
     - /
     pathType: Prefix
@@ -533,7 +559,7 @@ Note: you can refer this DOCs for the slack configuration. “https://prometheus
 upgrade the chart
 
 ```jsx
-helm upgrade my-kube-prometheus-stack prometheus-community/kube-prometheus-stack -f kube-prom-stack.yaml -n monitoring
+helm upgrade --install my-kube-prometheus-stack prometheus-community/kube-prometheus-stack -f kube-prom-stack.yaml -n monitoring
 ```
 
 get grafana secret “user = admin”
@@ -552,7 +578,7 @@ NOTE: The EBS driver we installed is for elasticsearch to dynamically provision 
 **Install Elastic Search:**
 
 ```jsx
-helm repo add elastic https://helm.elastic.co -n logging
+helm repo add elastic https://helm.elastic.co 
 helm install my-elasticsearch elastic/elasticsearch --version 8.5.1 -n logging
 ```
 
@@ -591,7 +617,7 @@ clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
 upgrade the chart
 
 ```jsx
-helm upgrade my-elasticsearch elastic/elasticsearch -f elasticsearch.yaml -n logging
+helm upgrade --install my-elasticsearch elastic/elasticsearch -f elasticsearch.yaml -n logging
 ```
 
 if upgarde doesnt happen then uninstall and install it again.
@@ -617,7 +643,7 @@ helm install my-filebeat elastic/filebeat --version 8.5.1 -n logging
 get the values
 
 ```jsx
-helm show values elastic/filebeat > filebeat.yaml 
+helm show  values elastic/filebeat > filebeat.yaml 
 ```
 
 Filebeat runs as a daemonset. check if its up.
@@ -671,13 +697,13 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/backend-protocol: HTTP
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:876997124628:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:123456789:certificate/b69bb6e7-cbd1-490b-b765-27574080f48c
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: logs-kibana.devopsdock.site
+    - host: logs-kibana.dewsecopai.online
       paths:
         - path: /
 ```
@@ -685,7 +711,7 @@ ingress:
 save the file and exit. upgrade the helm chart using the values file.
 
 ```jsx
-helm upgrade my-kibana elastic/kibana -f kibana.yaml -n logging
+helm upgrade --install my-kibana elastic/kibana -f kibana.yaml -n logging
 ```
 
 add all the records to route 53 and give the value as load balancer DNS name. and try to access one by one. 
@@ -693,7 +719,7 @@ add all the records to route 53 and give the value as load balancer DNS name. an
 retrive the secret of elastic search as kibana’s password, username is “elastic”
 
 ```jsx
-kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d
+kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d ;echo
 ```
 
 ### **Filebeat Configuration to ship the "easyshop" app logs to elasticsearch**
